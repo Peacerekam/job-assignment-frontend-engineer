@@ -1,6 +1,5 @@
-export default function Logout() {
+export const Navbar: React.FC = () => {
   return (
-    <>
       <nav className="navbar navbar-light">
         <div className="container">
           <a className="navbar-brand" href="/#">
@@ -38,18 +37,5 @@ export default function Logout() {
           </ul>
         </div>
       </nav>
-
-      <footer>
-        <div className="container">
-          <a href="/#" className="logo-font">
-            conduit
-          </a>
-          <span className="attribution">
-            An interactive learning project from <a href="https://thinkster.io">Thinkster</a>. Code &amp; design
-            licensed under MIT.
-          </span>
-        </div>
-      </footer>
-    </>
   );
-}
+};

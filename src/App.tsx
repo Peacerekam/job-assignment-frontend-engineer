@@ -1,17 +1,16 @@
 import React from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 
-import Article from "./Article";
-import ArticleList from "./ArticleList";
-import Editor from "./Editor";
-import LoginRegister from "./LoginRegister";
-import Logout from "./Logout";
-import Profile from "./Profile";
-import Settings from "./Settings";
+import { Article, ArticleList, Editor, LoginRegister, Logout, Profile, Settings } from "./pages";
+import { Footer, Navbar, NotificationsBar } from "components";
 
-function App() {
+import "./style.scss";
+
+const App: React.FC = () => {
   return (
     <Router>
+      <NotificationsBar />
+      <Navbar />
       <Switch>
         <Route path="/editor" exact component={Editor} />
         <Route path="/editor/:slug" exact component={Editor} />
@@ -24,8 +23,9 @@ function App() {
         <Route path="/:slug" exact component={Article} />
         <Route path="/" component={ArticleList} />
       </Switch>
+      <Footer />
     </Router>
   );
-}
+};
 
 export default App;
