@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import "./style.scss"
 
 export const Notifications: React.FC = () => {
   const [notification, setNotification] = useState<string>();
