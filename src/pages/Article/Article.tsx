@@ -1,119 +1,161 @@
+import { useArticle } from "hooks";
+import ReactMarkdown from "react-markdown";
+import { getFormattedDate, getMockedFullName } from "utils/helpers";
+import placeholder from "../../assets/placeholder.jpg";
+import { useLocation } from "react-router-dom";
+import { Comments } from "components";
+import "./style.scss";
+import axios from "axios";
+import { Article as ArticleType } from "hooks/useArticles";
+
 export const Article: React.FC = () => {
+  const location = useLocation();
+  const article = useArticle(location.pathname);
+
+  // @TODO: no full name in response, so lets mock it
+  const authorName = getMockedFullName(article?.author?.username);
+  const formattedDate = getFormattedDate(article?.createdAt);
+  const authorSlug = `/#/profile/${article?.author?.username}`;
+  const authorImage = article?.author.image || placeholder;
+
+  const handleFavorite = async ({ slug, favorited }: ArticleType) => {
+    const favoriteURL = `api/articles/${slug}/favorite`;
+    if (favorited) {
+      await axios.delete(favoriteURL);
+    } else {
+      await axios.post(favoriteURL);
+    }
+    window.dispatchEvent(new Event("favorited"));
+  };
+
+  const handleFollow = async ({ author }: ArticleType) => {
+    const followURL = `api/profiles/${author.username}/follow`;
+    if (author.following) {
+      await axios.delete(followURL);
+    } else {
+      await axios.post(followURL);
+    }
+    window.dispatchEvent(new Event("favorited"));
+  };
+
+  const favBtnClassName = ["btn btn-sm", article?.favorited ? "btn-primary favorited" : "btn-outline-primary"].join(
+    " "
+  );
+
+  const followBtnClassName = [
+    "btn btn-sm",
+    article?.author.following ? "btn-secondary favorited" : "btn-outline-secondary",
+  ].join(" ");
+
+  const displayBanner = (
+    <div className="banner">
+      <div className="container">
+        <h1>{article?.title}</h1>
+
+        <div className="article-meta">
+          <a href={authorSlug}>
+            <img src={authorImage} />
+          </a>
+          <div className="info">
+            <a href={authorSlug} className="author">
+              {authorName}
+            </a>
+            <span className="date">{formattedDate}</span>
+          </div>
+          <button className={followBtnClassName} onClick={() => article && handleFollow(article)}>
+            {article?.author.following ? (
+              <>
+                <i className="ion-android-done" />
+                &nbsp; Following {authorName}
+              </>
+            ) : (
+              <>
+                <i className="ion-plus-round" />
+                &nbsp; Follow {authorName}
+              </>
+            )}
+            {/* TODO: no follow count in API ?? */}
+            {/* <span className="counter">(10)</span> */}
+          </button>
+          &nbsp;&nbsp;
+          <button className={favBtnClassName} onClick={() => article && handleFavorite(article)}>
+            <i className="ion-heart" />
+            {article?.favorited ? (
+              <>
+                &nbsp; Favourited <span className="counter">({article?.favoritesCount})</span>
+              </>
+            ) : (
+              <>
+                &nbsp; Favorite Post <span className="counter">({article?.favoritesCount})</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const displayAuthorFooter = (
+    <div className="article-actions">
+      <div className="article-meta">
+        <a href={authorSlug}>
+          <img src={authorImage} />
+        </a>
+        <div className="info">
+          <a href={authorSlug} className="author">
+            {authorName}
+          </a>
+          <span className="date">{formattedDate}</span>
+        </div>
+        <button className={followBtnClassName} onClick={() => article && handleFollow(article)}>
+          {article?.author.following ? (
+            <>
+              <i className="ion-android-done" />
+              &nbsp; Following {authorName}
+            </>
+          ) : (
+            <>
+              <i className="ion-plus-round" />
+              &nbsp; Follow {authorName}
+            </>
+          )}
+        </button>
+        &nbsp;
+        <button className={favBtnClassName} onClick={() => article && handleFavorite(article)}>
+          <i className="ion-heart" />
+          {article?.favorited ? (
+            <>
+              &nbsp; Favourited <span className="counter">({article?.favoritesCount})</span>
+            </>
+          ) : (
+            <>
+              &nbsp; Favorite Post <span className="counter">({article?.favoritesCount})</span>
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <div className="article-page">
-        <div className="banner">
-          <div className="container">
-            <h1>How to build webapps that scale</h1>
-
-            <div className="article-meta">
-              <a href="/#/profile/ericsimmons">
-                <img src="http://i.imgur.com/Qr71crq.jpg" />
-              </a>
-              <div className="info">
-                <a href="/#/profile/ericsimmons" className="author">
-                  Eric Simons
-                </a>
-                <span className="date">January 20th</span>
-              </div>
-              <button className="btn btn-sm btn-outline-secondary">
-                <i className="ion-plus-round" />
-                &nbsp; Follow Eric Simons <span className="counter">(10)</span>
-              </button>
-              &nbsp;&nbsp;
-              <button className="btn btn-sm btn-outline-primary">
-                <i className="ion-heart" />
-                &nbsp; Favorite Post <span className="counter">(29)</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        {displayBanner}
 
         <div className="container page">
           <div className="row article-content">
             <div className="col-md-12">
-              <p>Web development technologies have evolved at an incredible clip over the past few years.</p>
-              <h2 id="introducing-ionic">Introducing RealWorld.</h2>
-              <p>It&lsquo;s a great solution for learning how other frameworks work.</p>
+              <ReactMarkdown>{article?.body ?? ""}</ReactMarkdown>
             </div>
           </div>
 
           <hr />
 
-          <div className="article-actions">
-            <div className="article-meta">
-              <a href="/#/profile/ericsimmons">
-                <img src="http://i.imgur.com/Qr71crq.jpg" />
-              </a>
-              <div className="info">
-                <a href="/#/profile/ericsimmons" className="author">
-                  Eric Simons
-                </a>
-                <span className="date">January 20th</span>
-              </div>
-              <button className="btn btn-sm btn-outline-secondary">
-                <i className="ion-plus-round" />
-                &nbsp; Follow Eric Simons
-              </button>
-              &nbsp;
-              <button className="btn btn-sm btn-outline-primary">
-                <i className="ion-heart" />
-                &nbsp; Favorite Post <span className="counter">(29)</span>
-              </button>
-            </div>
-          </div>
+          {displayAuthorFooter}
 
-          <div className="row">
-            <div className="col-xs-12 col-md-8 offset-md-2">
-              <form className="card comment-form">
-                <div className="card-block">
-                  <textarea className="form-control" placeholder="Write a comment..." rows={3} />
-                </div>
-                <div className="card-footer">
-                  <img src="http://i.imgur.com/Qr71crq.jpg" className="comment-author-img" />
-                  <button className="btn btn-sm btn-primary">Post Comment</button>
-                </div>
-              </form>
-
-              <div className="card">
-                <div className="card-block">
-                  <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                </div>
-                <div className="card-footer">
-                  <a href="/#/profile/jacobschmidt" className="comment-author">
-                    <img src="http://i.imgur.com/Qr71crq.jpg" className="comment-author-img" />
-                  </a>
-                  &nbsp;
-                  <a href="/#/profile/jacobschmidt" className="comment-author">
-                    Jacob Schmidt
-                  </a>
-                  <span className="date-posted">Dec 29th</span>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-block">
-                  <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                </div>
-                <div className="card-footer">
-                  <a href="/#/profile/jacobschmidt" className="comment-author">
-                    <img src="http://i.imgur.com/Qr71crq.jpg" className="comment-author-img" />
-                  </a>
-                  &nbsp;
-                  <a href="/#/profile/jacobschmidt" className="comment-author">
-                    Jacob Schmidt
-                  </a>
-                  <span className="date-posted">Dec 29th</span>
-                  <span className="mod-options">
-                    <i className="ion-edit" />
-                    <i className="ion-trash-a" />
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Comments />
         </div>
       </div>
     </>
   );
-}
+};

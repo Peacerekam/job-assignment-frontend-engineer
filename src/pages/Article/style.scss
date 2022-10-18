@@ -1,0 +1,57 @@
+.article-page {
+  .row.article-content {
+    p {
+      animation: reveal-text 1s ease-in-out;
+      animation-delay: calc(500ms * counter(article-paragraph));
+      animation-fill-mode: forwards;
+      opacity: 0;
+      img {
+        float: left;
+        margin-right: 0.75rem;
+      }
+
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          animation-delay: ($i * 250ms);
+        }
+      }
+    }
+  }
+  .banner {
+    max-height: 500px;
+    background-color: #333;
+    animation: banner-color 0.5s ease-in-out;
+    .container {
+      animation: banner-show 1.5s ease-in-out;
+    }
+  }
+}
+
+@keyframes reveal-text {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes banner-show {
+  0% {
+    transform: translateX(-130%);
+    max-height: 0px;
+  }
+  100% {
+    transform: translateX(0%);
+    max-height: 500px;
+  }
+}
+
+@keyframes banner-color {
+  0% {
+    background-color: #5cb85c;
+  }
+  100% {
+    background-color: #333;
+  }
+}

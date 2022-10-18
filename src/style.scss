@@ -2,3 +2,33 @@
 iframe {
   display: none;
 }
+
+.home-page {
+  .banner {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.banner {
+  min-height: 178px;
+}
+
+.user-img {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 0 60px -12px, rgba(0, 0, 0, 0.3) 0px 0 36px -18px;
+}
+
+a.nav-link i {
+  margin-right: 5px;
+}
+
+.favorited {
+  &.btn-primary,
+  &.btn-outline-primary {
+    color: red !important;
+  }
+  &.btn-secondary,
+  &.btn-outline-secondary {
+    color: #5cb85c !important;
+  }
+}

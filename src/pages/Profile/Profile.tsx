@@ -1,4 +1,35 @@
+import { useArticles, useProfile } from "hooks";
+import { ArticlePreview } from "components/ArticlePreview";
+import { useLocation } from "react-router-dom";
+import { getMockedFullName } from "utils/helpers";
+import placeholder from "../../assets/placeholder.jpg";
+import axios from "axios";
+
 export const Profile: React.FC = () => {
+  const location = useLocation();
+  const username = location.pathname.replace("/profile/", "");
+  const profile = useProfile(username);
+  const { articles } = useArticles({ author: profile?.username });
+
+  // @TODO: no full name in response, so lets mock it
+  const profileName = getMockedFullName(profile?.username);
+  const authorImage = profile?.image || placeholder;
+
+  const handleFollow = async () => {
+    const followURL = `api/profiles/${profile?.username}/follow`;
+    if (profile?.following) {
+      await axios.delete(followURL);
+    } else {
+      await axios.post(followURL);
+    }
+    window.dispatchEvent(new Event("favorited"));
+  };
+
+  const followBtnClassName = [
+    "btn btn-sm action-btn",
+    profile?.following ? "btn-secondary favorited" : "btn-outline-secondary",
+  ].join(" ");
+
   return (
     <>
       <div className="profile-page">
@@ -6,15 +37,21 @@ export const Profile: React.FC = () => {
           <div className="container">
             <div className="row">
               <div className="col-xs-12 col-md-10 offset-md-1">
-                <img src="http://i.imgur.com/Qr71crq.jpg" className="user-img" />
-                <h4>Eric Simons</h4>
-                <p>
-                  Cofounder @GoThinkster, lived in Aol&lsquo;s HQ for a few months, kinda looks like Peeta from the
-                  Hunger Games
-                </p>
-                <button className="btn btn-sm btn-outline-secondary action-btn">
-                  <i className="ion-plus-round" />
-                  &nbsp; Follow Eric Simons
+                <img src={authorImage} className="user-img" />
+                <h4>{profileName}</h4>
+                <p>{profile?.bio}</p>
+                <button className={followBtnClassName} onClick={() => handleFollow()}>
+                  {profile?.following ? (
+                    <>
+                      <i className="ion-android-done" />
+                      &nbsp; Following {profileName}
+                    </>
+                  ) : (
+                    <>
+                      <i className="ion-plus-round" />
+                      &nbsp; Follow {profileName}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -39,53 +76,9 @@ export const Profile: React.FC = () => {
                 </ul>
               </div>
 
-              <div className="article-preview">
-                <div className="article-meta">
-                  <a href="/#/profile/ericsimmons">
-                    <img src="http://i.imgur.com/Qr71crq.jpg" />
-                  </a>
-                  <div className="info">
-                    <a href="/#/profile/ericsimmons" className="author">
-                      Eric Simons
-                    </a>
-                    <span className="date">January 20th</span>
-                  </div>
-                  <button className="btn btn-outline-primary btn-sm pull-xs-right">
-                    <i className="ion-heart" /> 29
-                  </button>
-                </div>
-                <a href="/#/how-to-build-webapps-that-scale" className="preview-link">
-                  <h1>How to build webapps that scale</h1>
-                  <p>This is the description for the post.</p>
-                  <span>Read more...</span>
-                </a>
-              </div>
-
-              <div className="article-preview">
-                <div className="article-meta">
-                  <a href="/#/profile/albertpai">
-                    <img src="http://i.imgur.com/N4VcUeJ.jpg" />
-                  </a>
-                  <div className="info">
-                    <a href="/#/profile/albertpai" className="author">
-                      Albert Pai
-                    </a>
-                    <span className="date">January 20th</span>
-                  </div>
-                  <button className="btn btn-outline-primary btn-sm pull-xs-right">
-                    <i className="ion-heart" /> 32
-                  </button>
-                </div>
-                <a href="/#/the-song-you-wont-ever-stop-singing" className="preview-link">
-                  <h1>The song you won&lsquo;t ever stop singing. No matter how hard you try.</h1>
-                  <p>This is the description for the post.</p>
-                  <span>Read more...</span>
-                  <ul className="tag-list">
-                    <li className="tag-default tag-pill tag-outline">Music</li>
-                    <li className="tag-default tag-pill tag-outline">Song</li>
-                  </ul>
-                </a>
-              </div>
+              {articles.map(article => (
+                <ArticlePreview key={article.createdAt} article={article} />
+              ))}
             </div>
           </div>
         </div>

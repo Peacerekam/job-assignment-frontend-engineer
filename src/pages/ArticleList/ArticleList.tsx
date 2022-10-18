@@ -1,14 +1,16 @@
+import { Spinner } from "components";
 import { useArticles } from "hooks";
-import { ArticlePreview } from "./ArticlePreview";
+import { ArticlePreview } from "../../components/ArticlePreview";
 
 export const ArticleList: React.FC = () => {
-  const { articles, articlesCount } = useArticles();
+  const {
+    articles,
+    // articlesCount
+  } = useArticles();
 
-  console.log(articlesCount)
-  
   return (
     <>
-      {/* hero component */}
+      {/* hero component? */}
       <div className="home-page">
         <div className="banner">
           <div className="container">
@@ -20,6 +22,7 @@ export const ArticleList: React.FC = () => {
         <div className="container page">
           <div className="row">
             <div className="col-md-9">
+              {/* toggle component? */}
               <div className="feed-toggle">
                 <ul className="nav nav-pills outline-active">
                   <li className="nav-item">
@@ -38,51 +41,9 @@ export const ArticleList: React.FC = () => {
               {articles.map(article => (
                 <ArticlePreview key={article.createdAt} article={article} />
               ))}
-
-              <div className="article-preview">
-                <div className="article-meta">
-                  <a href="/#/profile/ericsimmons">
-                    <img src="http://i.imgur.com/Qr71crq.jpg" />
-                  </a>
-                  <div className="info">
-                    <a href="/#/profile/ericsimmons" className="author">
-                      Eric Simons
-                    </a>
-                    <span className="date">January 20th</span>
-                  </div>
-                  <button className="btn btn-outline-primary btn-sm pull-xs-right">
-                    <i className="ion-heart" /> 29
-                  </button>
-                </div>
-                <a href="/#/how-to-build-webapps-that-scale" className="preview-link">
-                  <h1>How to build webapps that scale</h1>
-                  <p>This is the description for the post.</p>
-                  <span>Read more...</span>
-                </a>
-              </div>
-
-              <div className="article-preview">
-                <div className="article-meta">
-                  <a href="/#/profile/albertpai">
-                    <img src="http://i.imgur.com/N4VcUeJ.jpg" />
-                  </a>
-                  <div className="info">
-                    <a href="/#/profile/albertpai" className="author">
-                      Albert Pai
-                    </a>
-                    <span className="date">January 20th</span>
-                  </div>
-                  <button className="btn btn-outline-primary btn-sm pull-xs-right">
-                    <i className="ion-heart" /> 32
-                  </button>
-                </div>
-                <a href="/#/the-song-you-wont-ever-stop-singing" className="preview-link">
-                  <h1>The song you won&lsquo;t ever stop singing. No matter how hard you try.</h1>
-                  <p>This is the description for the post.</p>
-                  <span>Read more...</span>
-                </a>
-              </div>
             </div>
+
+            {articles.length === 0 && <Spinner />}
 
             <div className="col-md-3">
               <div className="sidebar">
@@ -121,4 +82,4 @@ export const ArticleList: React.FC = () => {
       </div>
     </>
   );
-}
+};

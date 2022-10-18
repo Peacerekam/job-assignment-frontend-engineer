@@ -1,3 +1,5 @@
 export * from "./Navbar";
 export * from "./Footer";
-export * from "./NotificationsBar";
+export * from "./Spinner";
+export * from "./Comments";
+export * from "./Notifications";

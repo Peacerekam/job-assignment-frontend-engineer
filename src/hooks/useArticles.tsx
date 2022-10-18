@@ -1,9 +1,7 @@
 import axios, { AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-// use this as some base url for axios, check documentaiton
-const BACKEND_URL = "http://localhost:3000";
-const ARTICLES_FETCH_URL = `${BACKEND_URL}/api/articles`;
+const ARTICLES_FETCH_URL = `/api/articles`;
 
 export type Article = {
   author: {
@@ -15,8 +13,8 @@ export type Article = {
   body: string;
   createdAt: string;
   description: string;
-  favourited: false;
-  favouritesCount: number;
+  favorited: false;
+  favoritesCount: number;
   slug: string;
   tagList: string[];
   title: string;
@@ -33,22 +31,37 @@ type ArticlesHookData = {
   articlesCount: number;
 };
 
-export const useArticles = (): ArticlesHookData => {
+type GetArticlesParams = {
+  tag?: string;
+  author?: string;
+  favorited?: string;
+  limit?: number;
+  offset?: number;
+};
+
+export const useArticles = (params?: GetArticlesParams): ArticlesHookData => {
   const [articlesCount, setArticlesCount] = useState(0);
   const [articles, setArticles] = useState<Article[]>([]);
 
-  useEffect(() => {
-    handleFetch();
-  }, []);
+  const handleFetch = useCallback(async () => {
+    const hasUndefinedParams = params && !Object.values(params).find(p => p);
+    if (hasUndefinedParams) return;
 
-  const handleFetch = async () => {
-    const response: AxiosResponse<ArticlesResponse> = await axios.get(ARTICLES_FETCH_URL);
-
-    console.log("handleFetch", response);
-
+    const response: AxiosResponse<ArticlesResponse> = await axios.get(ARTICLES_FETCH_URL, { params });
     setArticles(response.data.articles);
     setArticlesCount(response.data.articlesCount);
-  };
+    // eslint-disable-next-line
+  }, [JSON.stringify(params)]);
+
+  useEffect(() => {
+    handleFetch();
+    window.addEventListener("favorited", handleFetch);
+    window.addEventListener("tokenChange", handleFetch);
+    return () => {
+      window.removeEventListener("favorited", handleFetch);
+      window.removeEventListener("tokenChange", handleFetch);
+    };
+  }, [handleFetch]);
 
   // nextPage, previousPage, lastPage, firstPage
   return { articles, articlesCount };
