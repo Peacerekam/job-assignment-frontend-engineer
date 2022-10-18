@@ -75,7 +75,7 @@ export const LoginRegister: React.FC = () => {
       setUserToken(userToken);
       history.push("/");
     } catch (err) {
-      const typedError = err as AxiosError & { response: { data: { message: string }; message: string } };
+      const typedError: any = err;
       setErrors([typedError.message || typedError?.response?.data?.message || typedError?.response?.message]);
     }
   };
